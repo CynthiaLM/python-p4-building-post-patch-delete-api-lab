@@ -23,13 +23,17 @@ def bakeries():
     bakeries = [bakery.to_dict() for bakery in Bakery.query.all()]
     return make_response(  bakeries,   200  )
 
-@app.route('/bakeries/<int:id>')
-def bakery_by_id(id):
+@app.route('/baked_goods/<int:id>', methods=['DELETE'])
+def delete_baked_good(id):
+    baked_good = BakedGood.query.get(id)
 
-    bakery = Bakery.query.filter_by(id=id).first()
-    bakery_serialized = bakery.to_dict()
-    return make_response ( bakery_serialized, 200  )
-
+    if baked_good:
+        db.session.delete(baked_good)
+        db.session.commit()
+        return jsonify({'message': 'Baked good deleted successfully'}), 200
+    else:
+        return jsonify({'error': 'Baked good not found'}), 404
+    
 @app.route('/baked_goods/by_price')
 def baked_goods_by_price():
     baked_goods_by_price = BakedGood.query.order_by(BakedGood.price.desc()).all()
